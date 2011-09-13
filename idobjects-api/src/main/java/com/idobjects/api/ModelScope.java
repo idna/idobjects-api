@@ -33,6 +33,10 @@ public class ModelScope{
     public boolean containsObject( ObjectIdentifier objectId ){
         return idObjectContainer.contains( objectId );
     }
+    
+    public int size(){
+        return idObjectContainer.size();
+    }
 
     void addChangeListener( ObjectIdentifier objectId, IdChangeListener changeListener ){
         List<IdChangeListener> listeners = listenersById.get( objectId );

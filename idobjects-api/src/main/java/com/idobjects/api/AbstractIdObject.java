@@ -1,11 +1,16 @@
 package com.idobjects.api;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.idobjects.api.md.IdObjectPropertyMD;
 import com.idobjects.api.md.IdObjectReferenceMD;
+import com.idobjects.api.md.ReferenceType;
+import com.idobjects.api.md.ReflectionUtil;
 
 public abstract class AbstractIdObject implements IdObject{
 
@@ -15,7 +20,7 @@ public abstract class AbstractIdObject implements IdObject{
 
     private final Map<IdObjectPropertyMD, Object> propertyValues = new LinkedHashMap<IdObjectPropertyMD, Object>();
 
-    private final Map<IdObjectReferenceMD, IdObjectReference> references = new LinkedHashMap<IdObjectReferenceMD, IdObjectReference>();
+    private final Map<IdObjectReferenceMD, List<IdObjectReference>> references = new LinkedHashMap<IdObjectReferenceMD, List<IdObjectReference>>();
 
     protected AbstractIdObject( ModelScope modelScope, ObjectIdentifier objectId ){
         if( modelScope == null ) throw new NullPointerException( "modelScope is null" );
@@ -48,43 +53,152 @@ public abstract class AbstractIdObject implements IdObject{
         propertyValues.put( property, value );
     }
 
-    protected IdObject getReference( IdObjectReferenceMD referenceMD ){
+    protected IdObject getReferencedObject( IdObjectReferenceMD referenceMD ){
         if( !references.containsKey( referenceMD ) ) return null;
-        return references.get( referenceMD ).getDestinationObject();
+        return references.get( referenceMD ).get( 0 ).getDestinationObject();
     }
 
-    protected void setReference( IdObjectReferenceMD referenceMD, IdObject value ){
-        IdObjectReference oldReference = references.get( referenceMD );
+    private void setSingleReference( IdObjectReferenceMD referenceMD, IdObject value, boolean addInverse ){
+        IdObjectReference oldReference = getSingleIdObjectReference( referenceMD );
         if( oldReference != null ){
             oldReference.clear();
+
         }
         IdObjectReference newReference = new IdObjectReference( this.getId(), value.getId(), getModelScope(), value.getModelScope(), referenceMD );
-        references.put( referenceMD, newReference );
+        references.put( referenceMD, oneElementList( newReference ) );
+
+        if( referenceMD.isBidirectional() && addInverse ){
+            ( ( AbstractIdObject )value ).addReferenceImpl( referenceMD.getInverseReferenceMD(), this, false );
+        }
     }
 
-    protected void removeReference( IdObjectReferenceMD referenceMD ){
-        IdObjectReference toRemove = references.remove( referenceMD );
-        if(toRemove != null) toRemove.clear();
+    private IdObjectReference getSingleIdObjectReference( IdObjectReferenceMD referenceMD ){
+        List<IdObjectReference> list = references.get( referenceMD );
+        if( list == null ) return null;
+        return list.get( 0 );
     }
-    
+
+    private List<IdObjectReference> oneElementList( IdObjectReference idObjectReference ){
+        List<IdObjectReference> result = new ArrayList<IdObjectReference>();
+        result.add( idObjectReference );
+        return result;
+    }
+
+    private void removeSingleReference( IdObjectReferenceMD referenceMD, boolean removeInverse ){
+        IdObjectReference toRemove = getSingleIdObjectReference( referenceMD );
+        if( toRemove == null ) return;
+        IdObject destinationObject = toRemove.getDestinationObject();
+        toRemove.clear();
+        references.remove( referenceMD );
+
+        if( referenceMD.isBidirectional() && removeInverse ){
+            ( ( AbstractIdObject )destinationObject ).removeReferenceImpl( referenceMD.getInverseReferenceMD(), this, false );
+        }
+
+    }
+
+    private void addListReference( IdObjectReferenceMD referenceMD, IdObject value, boolean addInverse ){
+        List<IdObjectReference> list = references.get( referenceMD );
+        if( list == null ){
+            list = new ArrayList<IdObjectReference>();
+            references.put( referenceMD, list );
+        }
+
+        IdObjectReference newReference = new IdObjectReference( this.getId(), value.getId(), getModelScope(), value.getModelScope(), referenceMD );
+        list.add( newReference );
+
+        if( referenceMD.isBidirectional() && addInverse ){
+            ( ( AbstractIdObject )value ).addReferenceImpl( referenceMD.getInverseReferenceMD(), this, false );
+        }
+
+    }
+
+    private void removeListReference( IdObjectReferenceMD referenceMD, IdObject value, boolean removeInverse ){
+        if( value == null ) throw new NullPointerException( "value is null" );
+        List<IdObjectReference> list = references.get( referenceMD );
+        if( list == null ) return;
+        IdObjectReference removed = searchAndRemoveReference( list, value.getId() );
+        if( removed != null ){
+            removed.clear();
+        }
+        if( list.size() == 0 ) references.remove( referenceMD );
+
+        if( referenceMD.isBidirectional() && removeInverse ){
+            ( ( AbstractIdObject )value ).removeReferenceImpl( referenceMD.getInverseReferenceMD(), this, false );
+        }
+    }
+
+    private IdObjectReference searchAndRemoveReference( List<IdObjectReference> searchIn, ObjectIdentifier destObjectId ){
+        for( Iterator<IdObjectReference> it = searchIn.iterator(); it.hasNext(); ){
+            IdObjectReference idObjectReference = it.next();
+            if( idObjectReference.getDestinationObjectId().equals( destObjectId ) ){
+                it.remove();
+                return idObjectReference;
+            }
+        }
+        return null;
+    }
+
     @Override
-    public void addReference( IdObjectReferenceMD referenceMD, ObjectIdentifier destinationId ){
-        // TODO Auto-generated method stub
-        
+    public void addReference( IdObjectReferenceMD referenceMD, IdObject value ){
+        addReferenceImpl( referenceMD, value, true );
     }
-    
+
+    private void addReferenceImpl( IdObjectReferenceMD referenceMD, IdObject value, boolean addInverse ){
+        switch ( referenceMD.getReferenceType() ){
+            case SINGLE:
+                setSingleReference( referenceMD, value, addInverse );
+                break;
+            case LIST:
+                addListReference( referenceMD, value, addInverse );
+                break;
+            default:
+                throw new IdObjectException( "Unknown referenceType: " + referenceMD.getReferenceType() );
+        }
+    }
+
     @Override
-    public void removeReference( IdObjectReferenceMD referenceMd, ObjectIdentifier destinationId ){
-        // TODO Auto-generated method stub
-        
+    public void removeReference( IdObjectReferenceMD referenceMD, IdObject value ){
+        removeReferenceImpl( referenceMD, value, true );
     }
-    
+
+    private void removeReferenceImpl( IdObjectReferenceMD referenceMD, IdObject value, boolean removeInverse ){
+        switch ( referenceMD.getReferenceType() ){
+            case SINGLE:
+                removeSingleReference( referenceMD, removeInverse );
+                break;
+            case LIST:
+                removeListReference( referenceMD, value, removeInverse );
+                break;
+            default:
+                throw new IdObjectException( "Unknown referenceType: " + referenceMD.getReferenceType() );
+        }
+    }
+
+    @Override
+    public List<IdObject> getReferences( IdObjectReferenceMD referenceMD ){
+        List<IdObjectReference> idObjectReferences = this.references.get( referenceMD );
+        if( idObjectReferences == null ) return new ArrayList<IdObject>();
+        List<IdObject> result = new ArrayList<IdObject>();
+        for( IdObjectReference idObjectReference : idObjectReferences ){
+            result.add( idObjectReference.getDestinationObject() );
+        }
+        return result;
+    }
+
+    protected <T> List<T> getCastedReferences( IdObjectReferenceMD referenceMD, Class<T> resultType ){
+        return ReflectionUtil.cast( getReferences( referenceMD ), resultType );
+    }
+
+    protected IdObject getSingleReference( IdObjectReferenceMD referenceMD ){
+        List<IdObject> referingObjects = getReferences( referenceMD );
+        return referingObjects.size() > 0 ? referingObjects.get( 0 ) : null;
+    }
 
     @Override
     public ModelScope getModelScope(){
         return modelScope;
     }
-    
 
     @Override
     public int hashCode(){

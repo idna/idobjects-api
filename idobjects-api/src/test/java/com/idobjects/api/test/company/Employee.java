@@ -27,15 +27,15 @@ public class Employee extends AbstractIdObject{
     }
 
     public void setDepartment( Department department ){
-        setReference( EmployeeMD.DEPARTMENT, department );
+        addReference( EmployeeMD.DEPARTMENT, department );
     }
 
     public Department getDepartment(){
-        return ( Department )getReference( EmployeeMD.DEPARTMENT );
+        return ( Department )getSingleReference( EmployeeMD.DEPARTMENT );
     }
-    
+
     public void removeDepartment(){
-        removeReference( EmployeeMD.DEPARTMENT );
+        removeReference( EmployeeMD.DEPARTMENT, null );
     }
 
 }

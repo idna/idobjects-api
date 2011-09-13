@@ -1,5 +1,8 @@
 package com.idobjects.api;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.idobjects.api.ModelScope.IdChangeListener;
 import com.idobjects.api.md.IdObjectReferenceMD;
 
@@ -11,50 +14,31 @@ public class IdObjectReferenceList{
     private ModelScope sourceModelScope;
     private ModelScope destinationModelScope;
 
-    private final SourceChangeListener sourceChangeListener = new SourceChangeListener();
-    private final DestinationChangeListener destinationChangeListener = new DestinationChangeListener();
+    private final List<IdObjectReference> references = new ArrayList<IdObjectReference>();
 
-    public IdObjectReferenceList( ObjectIdentifier source, ObjectIdentifier destination, ModelScope sourceModelScope, ModelScope destinationModelScope, IdObjectReferenceMD referenceMD ){
+    public IdObjectReferenceList( ObjectIdentifier source, ObjectIdentifier destination, ModelScope sourceModelScope, ModelScope destinationModelScope,
+            IdObjectReferenceMD referenceMD ){
         this.source = source;
         this.destination = destination;
-        this.referenceMD = referenceMD;
         this.sourceModelScope = sourceModelScope;
         this.destinationModelScope = destinationModelScope;
-
-        sourceModelScope.addChangeListener( source, sourceChangeListener );
-        sourceModelScope.addChangeListener( destination, destinationChangeListener );
+        this.referenceMD = referenceMD;
     }
 
-    public IdObject getDestinationObject(){
-        return destinationModelScope.getObject( destination );
+    public void add( ObjectIdentifier toAdd ){
+        
     }
 
-    public void clear(){
-        sourceModelScope.removeChangeListener( source, sourceChangeListener );
-        sourceModelScope.removeChangeListener( destination, destinationChangeListener );
+    public void remove( ObjectIdentifier toRemove ){
+
     }
 
-    @Override
-    public String toString(){
-        return "IdObjectReference [source=" + source + ", destination=" + destination + ", referenceMD=" + referenceMD + "]";
-    }
-
-    private class SourceChangeListener implements IdChangeListener{
-
-        @Override
-        public void idChanged( ObjectIdentifier oldId, ObjectIdentifier newId ){
-            source = newId;
+    public List<IdObject> getDesinitations(){
+        List<IdObject> result = new ArrayList<IdObject>();
+        for( IdObjectReference idObjectReference : references ){
+            result.add( idObjectReference.getDestinationObject() );
         }
-
-    }
-
-    private class DestinationChangeListener implements IdChangeListener{
-
-        @Override
-        public void idChanged( ObjectIdentifier oldId, ObjectIdentifier newId ){
-            destination = newId;
-        }
-
+        return result;
     }
 
 }

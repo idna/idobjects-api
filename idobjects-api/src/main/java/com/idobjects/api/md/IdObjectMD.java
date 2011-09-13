@@ -30,4 +30,18 @@ public class IdObjectMD{
         return new ArrayList<IdObjectPropertyMD>( properties );
     }
 
+    public IdObjectPropertyMD getPropertyByName( String name ){
+        for( IdObjectPropertyMD property : properties ){
+            if( property.getName().equals( name ) ) return property;
+        }
+        return null;
+    }
+
+    public IdObjectReferenceMD getReferenceByName( String name ){
+        for( IdObjectReferenceMD reference : references ){
+            if( reference.getName().equals( name ) ) return reference;
+        }
+        return null;
+    }
+
 }

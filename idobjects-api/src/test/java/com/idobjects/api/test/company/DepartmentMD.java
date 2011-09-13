@@ -8,13 +8,16 @@ import java.util.List;
 import com.idobjects.api.md.IdObjectMD;
 import com.idobjects.api.md.IdObjectPropertyMD;
 import com.idobjects.api.md.IdObjectReferenceMD;
-
+import com.idobjects.api.md.ReferenceType;
 
 public class DepartmentMD extends IdObjectMD{
-    
 
     public static final IdObjectPropertyMD NAME = new IdObjectPropertyMD( "name", String.class );
-    public static final IdObjectReferenceMD CHIEF = new IdObjectReferenceMD( DepartmentMD.class, EmployeeMD.class, "chief",null, false );
+
+    public static final IdObjectReferenceMD CHIEF = new IdObjectReferenceMD( DepartmentMD.class, EmployeeMD.class, "chief", null, false, ReferenceType.SINGLE,
+            CompanyModelMetada.class );
+    public static final IdObjectReferenceMD MEMBERS = new IdObjectReferenceMD( DepartmentMD.class, EmployeeMD.class, "members", "department", true, ReferenceType.LIST,
+            CompanyModelMetada.class );
 
     public static final List<IdObjectPropertyMD> PROPERTIES;
     public static final List<IdObjectReferenceMD> REFERENCES;
@@ -26,6 +29,7 @@ public class DepartmentMD extends IdObjectMD{
 
         List<IdObjectReferenceMD> references = new ArrayList<IdObjectReferenceMD>();
         references.add( CHIEF );
+        references.add( MEMBERS );
         REFERENCES = Collections.unmodifiableList( references );
     }
 

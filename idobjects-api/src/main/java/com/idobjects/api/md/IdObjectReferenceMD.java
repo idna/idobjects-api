@@ -4,21 +4,33 @@ public class IdObjectReferenceMD{
 
     private final Class< ? extends IdObjectMD> source;
     private final Class< ? extends IdObjectMD> destination;
-    private final String referenceName;
-    private final String inverseReferenceType;
+    private final String name;
+    private final String inverseReferenceName;
     private final boolean bidirectional;
+    private final ReferenceType referenceType;
+    private final Class modelMetadataClass;
 
-    public IdObjectReferenceMD( Class< ? extends IdObjectMD> source, Class< ? extends IdObjectMD> destination, String referenceName, String inverseReferenceType,
-            boolean bidirectional ){
+    public IdObjectReferenceMD( Class< ? extends IdObjectMD> source, Class< ? extends IdObjectMD> destination, String name, String inverseReferenceName, boolean bidirectional,
+            ReferenceType referenceType, Class modelMetadataClass ){
+
+        if( bidirectional && inverseReferenceName == null ) throw new IllegalArgumentException( "is bidirectional, but inverseReferenceName is null" );
+
         this.source = source;
         this.destination = destination;
-        this.referenceName = referenceName;
-        this.inverseReferenceType = inverseReferenceType;
+        this.name = name;
+        this.inverseReferenceName = inverseReferenceName;
         this.bidirectional = bidirectional;
+        this.referenceType = referenceType;
+        this.modelMetadataClass = modelMetadataClass;
+
     }
 
-    public String getInverseReferenceType(){
-        return inverseReferenceType;
+    public ReferenceType getReferenceType(){
+        return referenceType;
+    }
+
+    public String getInverseReferenceName(){
+        return inverseReferenceName;
     }
 
     public boolean isBidirectional(){
@@ -33,13 +45,14 @@ public class IdObjectReferenceMD{
         return ReflectionUtil.getIdObjectMD( destination );
     }
 
-    public String getReferenceName(){
-        return referenceName;
+    public String getName(){
+        return name;
     }
 
-    @Override
-    public String toString(){
-        return "IdObjectReference Metadata [source=" + source + ", destination=" + destination + ", referenceTypeName=" + referenceName + "]";
+    public IdObjectReferenceMD getInverseReferenceMD(){
+        if( !bidirectional ) return null;
+        return getDestination().getReferenceByName( inverseReferenceName );
     }
+    
 
 }
