@@ -1,7 +1,6 @@
 package com.idobjects.api;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -9,7 +8,6 @@ import java.util.Map;
 
 import com.idobjects.api.md.IdObjectPropertyMD;
 import com.idobjects.api.md.IdObjectReferenceMD;
-import com.idobjects.api.md.ReferenceType;
 import com.idobjects.api.md.ReflectionUtil;
 
 public abstract class AbstractIdObject implements IdObject{
