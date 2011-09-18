@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.idobjects.api.IdObjectException;
 
+//Test
 public abstract class ModelMetadata{
 
     private final List<IdObjectMD> objects = new ArrayList<IdObjectMD>();
