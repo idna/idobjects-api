@@ -5,49 +5,52 @@ import com.idobjects.api.md.IdObjectReferenceMD;
 
 public class IdObjectReference{
 
-    private ObjectIdentifier source;
-    private ObjectIdentifier destination;
+    private ObjectIdentifier sourceId;
+    private ObjectIdentifier destinationId;
     private final IdObjectReferenceMD referenceMD;
-    private ModelScope sourceModelScope;
-    private ModelScope destinationModelScope;
+    private final ModelScope modelScope;
 
     private final SourceChangeListener sourceChangeListener = new SourceChangeListener();
     private final DestinationChangeListener destinationChangeListener = new DestinationChangeListener();
 
-    public IdObjectReference( ObjectIdentifier source, ObjectIdentifier destination, ModelScope sourceModelScope, ModelScope destinationModelScope, IdObjectReferenceMD referenceMD ){
-        this.source = source;
-        this.destination = destination;
+    public IdObjectReference( ObjectIdentifier source, ObjectIdentifier destination, ModelScope modelScope, IdObjectReferenceMD referenceMD ){
+        this.sourceId = source;
+        this.destinationId = destination;
         this.referenceMD = referenceMD;
-        this.sourceModelScope = sourceModelScope;
-        this.destinationModelScope = destinationModelScope;
+        this.modelScope = modelScope;
 
-        sourceModelScope.addChangeListener( source, sourceChangeListener );
-        sourceModelScope.addChangeListener( destination, destinationChangeListener );
+        modelScope.addChangeListener( source, sourceChangeListener );
+        modelScope.addChangeListener( destination, destinationChangeListener );
     }
 
     public IdObject getDestinationObject(){
-        return destinationModelScope.getObject( destination );
+        return modelScope.getObject( destinationId );
     }
-    
+
     public ObjectIdentifier getDestinationObjectId(){
-        return destination;
+        return destinationId;
     }
 
     public void clear(){
-        sourceModelScope.removeChangeListener( source, sourceChangeListener );
-        sourceModelScope.removeChangeListener( destination, destinationChangeListener );
+        modelScope.removeChangeListener( sourceId, sourceChangeListener );
+        modelScope.removeChangeListener( destinationId, destinationChangeListener );
     }
 
     @Override
     public String toString(){
-        return "IdObjectReference [source=" + source + ", destination=" + destination + ", referenceMD=" + referenceMD + "]";
+        return "IdObjectReference [source=" + sourceId + ", destination=" + destinationId + ", referenceMD=" + referenceMD + "]";
     }
 
     private class SourceChangeListener implements IdChangeListener{
 
         @Override
         public void idChanged( ObjectIdentifier oldId, ObjectIdentifier newId ){
-            source = newId;
+            sourceId = newId;
+        }
+
+        @Override
+        public void newObject( ObjectIdentifier newId, IdObject newObject ){
+
         }
 
     }
@@ -56,7 +59,13 @@ public class IdObjectReference{
 
         @Override
         public void idChanged( ObjectIdentifier oldId, ObjectIdentifier newId ){
-            destination = newId;
+            destinationId = newId;
+        }
+
+        @Override
+        public void newObject( ObjectIdentifier newId, IdObject newObject ){
+            if( !referenceMD.isBidirectional() ) return;
+            ( ( AbstractIdObject )newObject ).addReferenceImpl( referenceMD.getInverseReferenceMD(), sourceId, false );
         }
 
     }

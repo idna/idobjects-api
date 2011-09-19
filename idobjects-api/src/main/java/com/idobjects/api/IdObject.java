@@ -12,10 +12,10 @@ public interface IdObject{
 
     ModelScope getModelScope();
 
-    void addReference( IdObjectReferenceMD referenceMD, IdObject value );
+    void addReference( IdObjectReferenceMD referenceMD, ObjectIdentifier destinationId );
 
-    void removeReference( IdObjectReferenceMD referenceMd, IdObject value );
+    void removeReference( IdObjectReferenceMD referenceMd, ObjectIdentifier destinationId );
     
-    List<IdObject> getReferences( IdObjectReferenceMD referenceMD );
+    List<IdObjectReference> getReferences( IdObjectReferenceMD referenceMD );
 
 }

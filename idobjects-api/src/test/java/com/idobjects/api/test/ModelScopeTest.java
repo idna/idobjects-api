@@ -1,5 +1,7 @@
 package com.idobjects.api.test;
 
+import java.util.Arrays;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -9,7 +11,9 @@ import com.idobjects.api.StringModelScopeIdentifier;
 import com.idobjects.api.md.IdObjectMD;
 import com.idobjects.api.md.ModelMetadata;
 import com.idobjects.api.test.company.Department;
+import com.idobjects.api.test.company.DepartmentMD;
 import com.idobjects.api.test.company.Employee;
+import com.idobjects.api.test.company.EmployeeMD;
 
 public class ModelScopeTest{
 
@@ -42,6 +46,16 @@ public class ModelScopeTest{
         Assert.assertNull( employee.getDepartment() );
 
         Assert.assertEquals( 0, department.getMembers().size() );
+
+        ModelScope modelScope2 = new ModelScope( new StringModelScopeIdentifier( "CompanyModelScope2" ) );
+        Employee employee2 = new Employee( modelScope2, new GuidObjectIdentifier() );
+
+        department.addReference( DepartmentMD.MEMBERS, employee2.getId() );
+        Assert.assertNull( department.getMembers().get( 0 ) );
+        Assert.assertNull(  department.getReferences( DepartmentMD.MEMBERS ).get( 0 ).getDestinationObject() );
+        Assert.assertEquals( employee2.getId(), department.getReferences( DepartmentMD.MEMBERS ).get( 0 ).getDestinationObjectId() );
+        
+        
 
     }
 
