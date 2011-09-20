@@ -57,6 +57,7 @@ public class ModelScopeTest{
         
         ModelScope copy = modelScope.copy( new StringModelScopeIdentifier( "ModelScop3" ) );
         Assert.assertEquals( modelScope.size(), copy.size() );
+        
 
     }
 

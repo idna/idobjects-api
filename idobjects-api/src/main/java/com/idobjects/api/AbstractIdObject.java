@@ -143,10 +143,11 @@ public abstract class AbstractIdObject implements IdObject{
     public void addReference( IdObjectReferenceMD referenceMD, ObjectIdentifier destinationId ){
         addReferenceImpl( referenceMD, destinationId, true );
     }
-
-    protected void addReference( IdObjectReferenceMD referenceMD, IdObject value ){
+    
+    protected void addReference(IdObjectReferenceMD referenceMD, IdObject value){
         addReferenceImpl( referenceMD, value.getId(), true );
     }
+    
 
     void addReferenceImpl( IdObjectReferenceMD referenceMD, ObjectIdentifier destinationId, boolean addInverse ){
         switch ( referenceMD.getReferenceType() ){
