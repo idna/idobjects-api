@@ -1,5 +1,7 @@
 package com.idobjects.api;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -43,6 +45,11 @@ public class DefaultIdObjectContainer implements IdObjectContainer{
         idObjects.remove( oldId );
         idObjects.put( newId, idObject );
 
+    }
+
+    @Override
+    public Collection<IdObject> elements(){
+        return Collections.unmodifiableCollection( idObjects.values() );
     }
 
 }
