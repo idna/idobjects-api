@@ -1,6 +1,7 @@
 package com.idobjects.api;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -49,6 +50,10 @@ public abstract class AbstractIdObject implements IdObject{
 
     protected void setPropertyValue( IdObjectPropertyMD property, Object value ){
         propertyValues.put( property, value );
+    }
+
+    protected void removePropertyValue( IdObjectPropertyMD propertyMD ){
+        propertyValues.remove( propertyMD );
     }
 
     protected IdObject getReferencedObject( IdObjectReferenceMD referenceMD ){
@@ -143,9 +148,15 @@ public abstract class AbstractIdObject implements IdObject{
     public void addReference( IdObjectReferenceMD referenceMD, ObjectIdentifier destinationId ){
         addReferenceImpl( referenceMD, destinationId, true );
     }
-    
-    protected void addReference(IdObjectReferenceMD referenceMD, IdObject value){
+
+    protected void addReference( IdObjectReferenceMD referenceMD, IdObject value ){
         addReferenceImpl( referenceMD, value.getId(), true );
+    }
+
+    protected void addReferences( IdObjectReferenceMD referenceMD, Collection< ? extends IdObject> values ){
+        for( IdObject value : values ){
+            addReference( referenceMD, value );
+        }
     }
 
     void addReferenceImpl( IdObjectReferenceMD referenceMD, ObjectIdentifier destinationId, boolean addInverse ){
@@ -164,6 +175,20 @@ public abstract class AbstractIdObject implements IdObject{
     @Override
     public void removeReference( IdObjectReferenceMD referenceMD, ObjectIdentifier destinationId ){
         removeReferenceImpl( referenceMD, destinationId, true );
+    }
+
+    protected void removeReference( IdObjectReferenceMD referenceMD, IdObject toRemove ){
+        removeReferenceImpl( referenceMD, toRemove.getId(), true );
+    }
+    
+    protected void removeReference( IdObjectReferenceMD referenceMD ){
+        removeReferenceImpl( referenceMD, null, true );
+    }
+
+    protected void removeReferences( IdObjectReferenceMD referenceMD, Collection< ? extends IdObject> toRemoveCollection ){
+        for( IdObject toRemove : toRemoveCollection ){
+            removeReferenceImpl( referenceMD, toRemove.getId(), true );
+        }
     }
 
     private void removeReferenceImpl( IdObjectReferenceMD referenceMD, ObjectIdentifier destinationId, boolean removeInverse ){
@@ -190,10 +215,8 @@ public abstract class AbstractIdObject implements IdObject{
     }
 
     @Override
-    public List<IdObjectReference> getReferences( IdObjectReferenceMD referenceMD ){
-        List<IdObjectReference> idObjectReferences = this.references.get( referenceMD );
-        if( idObjectReferences == null ) return new ArrayList<IdObjectReference>();
-        return new ArrayList<IdObjectReference>( idObjectReferences );
+    public Map<IdObjectReferenceMD, List<IdObjectReference>> getReferences(){
+        return new LinkedHashMap<IdObjectReferenceMD, List<IdObjectReference>>( references );
     }
 
     protected <T> List<T> getCastedReferences( IdObjectReferenceMD referenceMD, Class<T> resultType ){
@@ -208,6 +231,12 @@ public abstract class AbstractIdObject implements IdObject{
     @Override
     public ModelScope getModelScope(){
         return modelScope;
+    }
+
+    AbstractIdObject copy( ModelScope modelScope ){
+        AbstractIdObject result = ReflectionUtil.newIdObject( getClass(), modelScope, getId() );
+        result.propertyValues.putAll( propertyValues );
+        return result;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.idobjects.api;
 
 import java.util.List;
+import java.util.Map;
 
 import com.idobjects.api.md.IdObjectReferenceMD;
 
@@ -15,7 +16,7 @@ public interface IdObject{
     void addReference( IdObjectReferenceMD referenceMD, ObjectIdentifier destinationId );
 
     void removeReference( IdObjectReferenceMD referenceMd, ObjectIdentifier destinationId );
-    
-    List<IdObjectReference> getReferences( IdObjectReferenceMD referenceMD );
+
+    Map<IdObjectReferenceMD, List<IdObjectReference>> getReferences();
 
 }

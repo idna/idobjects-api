@@ -18,6 +18,10 @@ public class Employee extends AbstractIdObject{
         setPropertyValue( EmployeeMD.FIRST_NAME, firstName );
     }
 
+    public void removeFirstName(){
+        removePropertyValue( EmployeeMD.FIRST_NAME );
+    }
+
     public String getLastName(){
         return ( String )getPropertyValue( EmployeeMD.LAST_NAME );
     }
@@ -35,7 +39,7 @@ public class Employee extends AbstractIdObject{
     }
 
     public void removeDepartment(){
-        removeReference( EmployeeMD.DEPARTMENT, null );
+        removeReference( EmployeeMD.DEPARTMENT );
     }
 
 }

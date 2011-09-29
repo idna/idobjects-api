@@ -52,9 +52,11 @@ public class ModelScopeTest{
 
         department.addReference( DepartmentMD.MEMBERS, employee2.getId() );
         Assert.assertNull( department.getMembers().get( 0 ) );
-        Assert.assertNull(  department.getReferences( DepartmentMD.MEMBERS ).get( 0 ).getDestinationObject() );
-        Assert.assertEquals( employee2.getId(), department.getReferences( DepartmentMD.MEMBERS ).get( 0 ).getDestinationObjectId() );
+        Assert.assertNull(  department.getReferences().get( DepartmentMD.MEMBERS ).get( 0 ).getDestinationObject() );
+        Assert.assertEquals( employee2.getId(), department.getReferences().get( DepartmentMD.MEMBERS ).get( 0 ).getDestinationObjectId() );
         
+        ModelScope copy = modelScope.copy( new StringModelScopeIdentifier( "ModelScop3" ) );
+        Assert.assertEquals( modelScope.size(), copy.size() );
         
 
     }

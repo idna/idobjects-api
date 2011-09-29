@@ -5,6 +5,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.idobjects.api.md.IdObjectReferenceMD;
+
 public class ModelScope{
 
     private final ModelScopeIdentifier modelScopeId;
@@ -36,6 +38,38 @@ public class ModelScope{
 
     public int size(){
         return idObjectContainer.size();
+    }
+
+    public ModelScope copy( ModelScopeIdentifier identifier ){
+        ModelScope newModelScope = new ModelScope( identifier );
+
+        List<AbstractIdObject> newObjects = new ArrayList<AbstractIdObject>();
+        for( IdObject idObject : idObjectContainer.elements() ){
+            AbstractIdObject abstractIdObject = ( AbstractIdObject )idObject;
+            AbstractIdObject newObject = abstractIdObject.copy( newModelScope );
+            newObjects.add( newObject );
+        }
+
+        for( AbstractIdObject newIdObject : newObjects ){
+            copyReferences( getObject( newIdObject.getId() ), newModelScope );
+        }
+
+        return newModelScope;
+
+    }
+
+    private void copyReferences( IdObject source, ModelScope targetModelScope ){
+        Map<IdObjectReferenceMD, List<IdObjectReference>> referenceMap = source.getReferences();
+        for( IdObjectReferenceMD referenceMD : referenceMap.keySet() ){
+            List<IdObjectReference> referenceList = referenceMap.get( referenceMD );
+            for( IdObjectReference reference : referenceList ){
+
+                IdObject sourceObject = targetModelScope.getObject( reference.getSourceObjectId() );
+                ObjectIdentifier destinationId = reference.getDestinationObjectId();
+                sourceObject.addReference( referenceMD, destinationId );
+            }
+        }
+
     }
 
     void addChangeListener( ObjectIdentifier objectId, IdChangeListener changeListener ){

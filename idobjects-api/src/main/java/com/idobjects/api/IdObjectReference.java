@@ -31,6 +31,10 @@ public class IdObjectReference{
         return destinationId;
     }
 
+    public ObjectIdentifier getSourceObjectId(){
+        return sourceId;
+    }
+
     public void clear(){
         modelScope.removeChangeListener( sourceId, sourceChangeListener );
         modelScope.removeChangeListener( destinationId, destinationChangeListener );

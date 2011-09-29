@@ -21,7 +21,7 @@ public class Department extends AbstractIdObject{
     }
 
     public void removeChief(){
-        removeReference( DepartmentMD.CHIEF, null );
+        removeReference( DepartmentMD.CHIEF);
     }
 
     public void addMember( Employee employee ){
