@@ -16,8 +16,9 @@ public class ReflectionUtil{
         return ( IdObjectMD )getInstance( clazz );
     }
 
-    private static Object getInstance( Class idObjectMDclazz )
-{
+    private static Object getInstance( Class idObjectMDclazz ){
+        
+        
         try{
             Method instanceMethod = idObjectMDclazz.getMethod( "instance" );
             return ( IdObjectMD )instanceMethod.invoke( null );
