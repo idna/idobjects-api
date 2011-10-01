@@ -11,6 +11,8 @@ public class ModelScope{
 
     private final ModelScopeIdentifier modelScopeId;
 
+
+
     private final IdObjectContainer idObjectContainer;
 
     private final Map<ObjectIdentifier, List<IdChangeListener>> listenersById = new LinkedHashMap<ObjectIdentifier, List<IdChangeListener>>();
