@@ -5,7 +5,7 @@ import com.idobjects.api.ModelScope;
 import com.idobjects.api.ObjectIdentifier;
 
 public class Employee extends AbstractIdObject{
-
+    
     public Employee( ModelScope modelScope, ObjectIdentifier objectId ){
         super( modelScope, objectId );
     }
