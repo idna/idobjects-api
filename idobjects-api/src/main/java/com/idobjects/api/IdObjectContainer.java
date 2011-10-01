@@ -19,6 +19,8 @@ public interface IdObjectContainer{
     
     void changeId( ObjectIdentifier oldId, ObjectIdentifier newId, IdObject idObject);
     
+    
+    
     Collection<IdObject> elements();
 
 }
