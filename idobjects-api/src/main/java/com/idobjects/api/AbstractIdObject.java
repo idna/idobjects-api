@@ -21,6 +21,20 @@ public abstract class AbstractIdObject implements IdObject{
 
     private final Map<IdObjectReferenceMD, List<IdObjectReference>> references = new LinkedHashMap<IdObjectReferenceMD, List<IdObjectReference>>();
 
+    private static final Map<Class, Object> primitiveDefaultValues = new LinkedHashMap<Class, Object>();
+
+    static{
+        primitiveDefaultValues.put( byte.class, ( byte )0 );
+        primitiveDefaultValues.put( short.class, ( short )0 );
+        primitiveDefaultValues.put( int.class, ( int )0 );
+        primitiveDefaultValues.put( long.class, 0L );
+        primitiveDefaultValues.put( float.class, 0.0f );
+        primitiveDefaultValues.put( double.class, 0.0d );
+        primitiveDefaultValues.put( boolean.class, false );
+        primitiveDefaultValues.put( char.class, '\u0000' );
+
+    }
+
     protected AbstractIdObject( ModelScope modelScope, ObjectIdentifier objectId ){
         if( modelScope == null ) throw new NullPointerException( "modelScope is null" );
         if( objectId == null ) throw new NullPointerException( "objectId is null" );
@@ -44,8 +58,10 @@ public abstract class AbstractIdObject implements IdObject{
         modelScope.idChanged( this, oldId, newId );
     }
 
-    protected Object getPropertyValue( IdObjectPropertyMD chief ){
-        return propertyValues.get( chief );
+    protected Object getPropertyValue( IdObjectPropertyMD propertyMD ){
+        Object result = propertyValues.get( propertyMD );
+        if( result != null || !propertyMD.getType().isPrimitive() ) return result;
+        return primitiveDefaultValues.get( propertyMD.getType() );
     }
 
     protected void setPropertyValue( IdObjectPropertyMD property, Object value ){
@@ -180,7 +196,7 @@ public abstract class AbstractIdObject implements IdObject{
     protected void removeReference( IdObjectReferenceMD referenceMD, IdObject toRemove ){
         removeReferenceImpl( referenceMD, toRemove.getId(), true );
     }
-    
+
     protected void removeReference( IdObjectReferenceMD referenceMD ){
         removeReferenceImpl( referenceMD, null, true );
     }

@@ -1,10 +1,13 @@
 package com.idobjects.api.md;
 
+import java.awt.List;
+
 public class IdObjectPropertyMD{
 
     private final String name;
 
     private final Class type;
+    
 
     public IdObjectPropertyMD( String name, Class type ){
         super();
@@ -19,5 +22,6 @@ public class IdObjectPropertyMD{
     public String getName(){
         return name;
     }
+    
 
 }
