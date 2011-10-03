@@ -64,12 +64,16 @@ public abstract class AbstractIdObject implements IdObject{
         return primitiveDefaultValues.get( propertyMD.getType() );
     }
 
-    protected void setPropertyValue( IdObjectPropertyMD property, Object value ){
-        propertyValues.put( property, value );
+    protected void setPropertyValue( IdObjectPropertyMD propertyMD, Object value ){
+        Object oldValue = getPropertyValue( propertyMD );
+        propertyValues.put( propertyMD, value );
+        modelScope.idObjectPropertyChanged( oldValue, value, this );
     }
 
     protected void removePropertyValue( IdObjectPropertyMD propertyMD ){
+        Object oldValue = getPropertyValue( propertyMD );
         propertyValues.remove( propertyMD );
+        modelScope.idObjectPropertyChanged( oldValue, null, this );
     }
 
     protected IdObject getReferencedObject( IdObjectReferenceMD referenceMD ){
@@ -81,10 +85,12 @@ public abstract class AbstractIdObject implements IdObject{
         IdObjectReference oldReference = getSingleIdObjectReference( referenceMD );
         if( oldReference != null ){
             oldReference.clear();
-
+            modelScope.referenceRemoved( oldReference );
         }
         IdObjectReference newReference = new IdObjectReference( this.getId(), destinationId, getModelScope(), referenceMD );
         references.put( referenceMD, oneElementList( newReference ) );
+
+        modelScope.referenceAdded( newReference );
 
         IdObject destination = modelScope.getObject( destinationId );
         if( destination != null && referenceMD.isBidirectional() && addInverse ){
@@ -110,6 +116,8 @@ public abstract class AbstractIdObject implements IdObject{
         toRemove.clear();
         references.remove( referenceMD );
 
+        modelScope.referenceRemoved( toRemove );
+
         IdObject destinationObject = toRemove.getDestinationObject();
         if( destinationObject != null && referenceMD.isBidirectional() && removeInverse ){
             ( ( AbstractIdObject )destinationObject ).removeReferenceImpl( referenceMD.getInverseReferenceMD(), getId(), false );
@@ -126,6 +134,9 @@ public abstract class AbstractIdObject implements IdObject{
 
         IdObjectReference newReference = new IdObjectReference( this.getId(), destinationId, getModelScope(), referenceMD );
         list.add( newReference );
+
+        modelScope.referenceAdded( newReference );
+
         IdObject destination = modelScope.getObject( destinationId );
         if( destination != null && referenceMD.isBidirectional() && addInverse ){
 
@@ -142,6 +153,8 @@ public abstract class AbstractIdObject implements IdObject{
             removed.clear();
         }
         if( list.size() == 0 ) references.remove( referenceMD );
+
+        modelScope.referenceRemoved( removed );
 
         IdObject destination = modelScope.getObject( destinationId );
         if( destination != null && referenceMD.isBidirectional() && removeInverse ){
@@ -218,6 +231,7 @@ public abstract class AbstractIdObject implements IdObject{
             default:
                 throw new IdObjectException( "Unknown referenceType: " + referenceMD.getReferenceType() );
         }
+
     }
 
     protected List<IdObject> getReferenceDestinations( IdObjectReferenceMD referenceMD ){

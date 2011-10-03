@@ -15,6 +15,8 @@ public class ModelScope{
 
     private final Map<ObjectIdentifier, List<IdChangeListener>> listenersById = new LinkedHashMap<ObjectIdentifier, List<IdChangeListener>>();
 
+    private final List<ModelScopeListener> modelScopeListeners = new ArrayList<ModelScopeListener>();
+
     public ModelScope( ModelScopeIdentifier modelScopeId ){
         this.modelScopeId = modelScopeId;
         this.idObjectContainer = createIdObjectContainer();
@@ -58,6 +60,44 @@ public class ModelScope{
 
     }
 
+    public void addModelScopeListener( ModelScopeListener listener ){
+        modelScopeListeners.add( listener );
+    }
+
+    public void removeModelScopeListener( ModelScopeListener toRemove ){
+        modelScopeListeners.remove( toRemove );
+    }
+
+    private void fireObjectAdded( IdObject newObject ){
+        for( ModelScopeListener listener : modelScopeListeners ){
+            listener.objectAdded( newObject );
+        }
+    }
+
+    private void fireObjectChanged( IdObject changedObject ){
+        for( ModelScopeListener listener : modelScopeListeners ){
+            listener.objectChanged( changedObject );
+        }
+    }
+
+    private void fireObjectRemoved( IdObject removedObject ){
+        for( ModelScopeListener listener : modelScopeListeners ){
+            listener.objectRemoved( removedObject );
+        }
+    }
+
+    private void fireReferenceAdded( IdObjectReference newReference ){
+        for( ModelScopeListener listener : modelScopeListeners ){
+            listener.referenceAdded( newReference );
+        }
+    }
+
+    private void fireReferenceRemoved( IdObjectReference removedReference ){
+        for( ModelScopeListener listener : modelScopeListeners ){
+            listener.referenceRemoved( removedReference );
+        }
+    }
+
     private void copyReferences( IdObject source, ModelScope targetModelScope ){
         Map<IdObjectReferenceMD, List<IdObjectReference>> referenceMap = source.getReferences();
         for( IdObjectReferenceMD referenceMD : referenceMap.keySet() ){
@@ -90,12 +130,26 @@ public class ModelScope{
         if( idObjectContainer.contains( newId ) ){ throw new IdObjectException( "Duplicate object with id " + newId ); }
         idObjectContainer.add( idObject );
         fireNewObject( idObject );
+        fireObjectAdded( idObject );
     }
 
     void idChanged( ObjectIdentifier oldId, ObjectIdentifier newId, IdObject idObject ){
         if( oldId.equals( newId ) ) return;
         if( idObjectContainer.contains( newId ) ){ throw new IdObjectException( "Duplicate object with id " + newId ); }
         fireIdChanged( oldId, newId );
+        fireObjectChanged( idObject );
+    }
+
+    void idObjectPropertyChanged( Object oldValue, Object newValue, IdObject idObject ){
+        fireObjectChanged( idObject );
+    }
+
+    void referenceRemoved( IdObjectReference removed ){
+        fireReferenceRemoved( removed );
+    }
+
+    void referenceAdded( IdObjectReference added ){
+        fireReferenceAdded( added );
     }
 
     private void fireIdChanged( ObjectIdentifier oldId, ObjectIdentifier newId ){
@@ -130,6 +184,20 @@ public class ModelScope{
         listeners.remove( changeListener );
         if( listeners.size() == 0 ) listenersById.remove( objectId );
 
+    }
+
+    public void removeIdObject( IdObject toRemove ){
+        Map<IdObjectReferenceMD, List<IdObjectReference>> references = toRemove.getReferences();
+        // First remove all references from the object
+        for( IdObjectReferenceMD referenceMD : references.keySet() ){
+            for( IdObjectReference reference : references.get( referenceMD ) ){
+                toRemove.removeReference( referenceMD, reference.getDestinationObjectId() );
+            }
+        }
+
+        // ... then remove the object itself
+        idObjectContainer.remove( toRemove );
+        fireObjectRemoved( toRemove );
     }
 
 }
