@@ -34,6 +34,10 @@ public class ModelScope{
         return idObjectContainer.get( objectId );
     }
 
+    public List<IdObject> getObjects(){
+        return new ArrayList<IdObject>( idObjectContainer.elements() );
+    }
+
     public boolean containsObject( ObjectIdentifier objectId ){
         return idObjectContainer.contains( objectId );
     }

@@ -76,6 +76,10 @@ public abstract class AbstractIdObject implements IdObject{
         modelScope.idObjectPropertyChanged( oldValue, null, this );
     }
 
+    public Map<IdObjectPropertyMD, Object> getPropertyValues(){
+        return new LinkedHashMap<IdObjectPropertyMD, Object>( propertyValues );
+    }
+
     protected IdObject getReferencedObject( IdObjectReferenceMD referenceMD ){
         if( !references.containsKey( referenceMD ) ) return null;
         return references.get( referenceMD ).get( 0 ).getDestinationObject();
