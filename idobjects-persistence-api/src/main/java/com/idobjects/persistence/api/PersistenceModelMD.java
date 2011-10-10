@@ -5,13 +5,13 @@ import java.util.List;
 
 import com.idobjects.api.md.ModelMetadata;
 
-public class PersistenceMD{
+public class PersistenceModelMD{
 
     private final List<PersistenceObjectMD> objects = new ArrayList<PersistenceObjectMD>();
     
     private final ModelMetadata modelMD;
 
-    public PersistenceMD(ModelMetadata modelMD, List<PersistenceObjectMD> objects ){
+    public PersistenceModelMD(ModelMetadata modelMD, List<PersistenceObjectMD> objects ){
         this.modelMD = modelMD;
         this.objects.addAll( objects );
     }

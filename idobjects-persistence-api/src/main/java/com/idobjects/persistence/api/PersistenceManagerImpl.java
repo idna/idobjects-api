@@ -17,9 +17,9 @@ public class PersistenceManagerImpl implements PersistenceManager{
 
     private final SessionFactory sessionFactory;
 
-    private final PersistenceMD persistenceMD;
+    private final PersistenceModelMD persistenceMD;
 
-    public PersistenceManagerImpl( SessionFactory sessionFactory, PersistenceMD persistenceMD ){
+    public PersistenceManagerImpl( SessionFactory sessionFactory, PersistenceModelMD persistenceMD ){
         this.sessionFactory = sessionFactory;
         this.persistenceMD = persistenceMD;
     }
@@ -65,7 +65,7 @@ public class PersistenceManagerImpl implements PersistenceManager{
 
         AbstractPO persistenceObject = ( AbstractPO )persistenceObjectMD.getPersistenceObjectClass().newInstance();
 
-        IdObjectMD idObjectMD = persistenceMD.getModelMD().getIdObjectMDByClass( abstractIdObject.getClass() );
+        IdObjectMD idObjectMD = persistenceMD.getModelMD().getIdObjectMDByIdObjectClass( abstractIdObject.getClass() );
         List<IdObjectPropertyMD> allProperties = idObjectMD.getProperties();
 
         // convert the properties from idObject to persistenceObject
@@ -74,6 +74,9 @@ public class PersistenceManagerImpl implements PersistenceManager{
             PersistencePropertyMD persistencePropertyMD = persistenceObjectMD.getProperty( propertyMD );
             persistenceObject.setPropertyValue( persistencePropertyMD, propertyValue );
         }
+        
+        persistenceObject.setObjectId( abstractIdObject.getId().toString() );
+        
         return persistenceObject;
     }
 
