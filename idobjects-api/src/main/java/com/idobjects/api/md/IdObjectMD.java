@@ -6,20 +6,20 @@ import java.util.List;
 
 public class IdObjectMD{
 
-    private final String className;
+    private final Class idObjectClass;
 
     private final List<IdObjectReferenceMD> references = new ArrayList<IdObjectReferenceMD>();
 
     private final List<IdObjectPropertyMD> properties = new ArrayList<IdObjectPropertyMD>();
 
-    public IdObjectMD( String className, Collection<IdObjectPropertyMD> properties, Collection<IdObjectReferenceMD> references ){
-        this.className = className;
+    public IdObjectMD( Class idObjectClass, Collection<IdObjectPropertyMD> properties, Collection<IdObjectReferenceMD> references ){
+        this.idObjectClass = idObjectClass;
         this.properties.addAll( properties );
         this.references.addAll( references );
     }
 
-    public String getClassName(){
-        return className;
+    public Class getIObjectClass(){
+        return idObjectClass;
     }
 
     public List<IdObjectReferenceMD> getReferences(){

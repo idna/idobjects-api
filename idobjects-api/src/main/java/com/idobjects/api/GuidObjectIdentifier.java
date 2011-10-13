@@ -38,7 +38,7 @@ public class GuidObjectIdentifier implements ObjectIdentifier{
 
     @Override
     public String toString(){
-        return "GuidObjectIdentifier [guid=" + guid + "]";
+        return guid;
     }
 
     private static class GuidGenerator{
