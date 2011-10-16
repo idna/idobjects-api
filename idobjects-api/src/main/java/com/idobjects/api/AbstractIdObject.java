@@ -64,7 +64,7 @@ public abstract class AbstractIdObject implements IdObject{
         return primitiveDefaultValues.get( propertyMD.getType() );
     }
 
-    protected void setPropertyValue( IdObjectPropertyMD propertyMD, Object value ){
+    public void setPropertyValue( IdObjectPropertyMD propertyMD, Object value ){
         Object oldValue = getPropertyValue( propertyMD );
         propertyValues.put( propertyMD, value );
         modelScope.idObjectPropertyChanged( oldValue, value, this );
@@ -299,4 +299,12 @@ public abstract class AbstractIdObject implements IdObject{
         return true;
     }
 
+    @Override
+    public boolean comparesContentTo( IdObject idObject ){
+        if( idObject == null ) return false;
+        if( idObject == this ) return true;
+        // TODO: Buggy!!
+        Map<IdObjectPropertyMD, Object> otherValues = ( ( AbstractIdObject )idObject ).propertyValues;
+        return otherValues.equals( propertyValues );
+    }
 }

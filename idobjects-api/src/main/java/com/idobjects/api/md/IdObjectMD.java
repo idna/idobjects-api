@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class IdObjectMD{
+import com.idobjects.api.AbstractIdObject;
+import com.idobjects.api.ModelScope;
+import com.idobjects.api.ObjectIdentifier;
+
+public abstract class IdObjectMD{
 
     private final Class idObjectClass;
 
@@ -18,7 +22,7 @@ public class IdObjectMD{
         this.references.addAll( references );
     }
 
-    public Class getIObjectClass(){
+    public Class getIdObjectClass(){
         return idObjectClass;
     }
 
@@ -42,6 +46,13 @@ public class IdObjectMD{
             if( reference.getName().equals( name ) ) return reference;
         }
         return null;
+    }
+
+    public abstract AbstractIdObject createNewIdObject( ModelScope modelScope, ObjectIdentifier objectId );
+
+    @Override
+    public String toString(){
+        return "IdObjectMD [idObjectClass=" + idObjectClass + ", properties=" + properties + ", references=" + references + "]";
     }
 
 }

@@ -49,5 +49,4 @@ public class ReferencePO{
     public void setDestinationId( String destinationId ){
         this.destinationId = destinationId;
     }
-
 }

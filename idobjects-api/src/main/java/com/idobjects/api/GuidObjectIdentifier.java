@@ -11,6 +11,11 @@ public class GuidObjectIdentifier implements ObjectIdentifier{
 
     private final String guid;
 
+    public GuidObjectIdentifier( String guid ){
+        if( guid == null ) throw new NullPointerException();
+        this.guid = guid;
+    }
+
     public GuidObjectIdentifier(){
         guid = GuidGenerator.newRandomGUID();
     }

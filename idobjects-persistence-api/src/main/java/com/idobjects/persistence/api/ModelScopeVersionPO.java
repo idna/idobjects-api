@@ -3,12 +3,14 @@ package com.idobjects.persistence.api;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 
 @MappedSuperclass
-public class ModelScopeKeyPO{
+public class ModelScopeVersionPO{
 
     private Integer id;
-    private String modelScopeKey;
+    private ModelScopeKeyPO modelScopeKey;
+    private int version;
 
     @Id
     @GeneratedValue
@@ -20,11 +22,20 @@ public class ModelScopeKeyPO{
         this.id = id;
     }
 
-    public String getModelScopeKey(){
+    public int getVersion(){
+        return version;
+    }
+
+    public void setVersion( int version ){
+        this.version = version;
+    }
+
+    @Transient
+    public ModelScopeKeyPO getModelScopeKey(){
         return modelScopeKey;
     }
 
-    public void setModelScopeKey( String modelScopeKey ){
+    public void setModelScopeKey( ModelScopeKeyPO modelScopeKey ){
         this.modelScopeKey = modelScopeKey;
     }
 

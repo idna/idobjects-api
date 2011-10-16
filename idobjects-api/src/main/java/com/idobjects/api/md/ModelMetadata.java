@@ -20,7 +20,7 @@ public abstract class ModelMetadata{
 
     public IdObjectMD getIdObjectMDByIdObjectClass( Class idObjectClass ){
         for( IdObjectMD idObjectMD : objects ){
-            if( idObjectMD.getIObjectClass().equals( idObjectClass ) ) return idObjectMD;
+            if( idObjectMD.getIdObjectClass().equals( idObjectClass ) ) return idObjectMD;
         }
         throw new IdObjectException( "No IdObjectMD instance for class " + idObjectClass );
     }

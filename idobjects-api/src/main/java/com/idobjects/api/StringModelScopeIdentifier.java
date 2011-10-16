@@ -1,19 +1,17 @@
 package com.idobjects.api;
 
-
-
 public class StringModelScopeIdentifier implements ModelScopeIdentifier{
-    
+
     private final String name;
 
     public StringModelScopeIdentifier( String name ){
-        if(name == null) throw new NullPointerException( "name is null" );
+        if( name == null ) throw new NullPointerException( "name is null" );
         this.name = name;
     }
 
     @Override
     public String toString(){
-        return "StringModelScopeIdentifier [name=" + name + "]";
+        return name;
     }
 
     @Override
@@ -36,5 +34,5 @@ public class StringModelScopeIdentifier implements ModelScopeIdentifier{
         else if( !name.equals( other.name ) ) return false;
         return true;
     }
-    
+
 }

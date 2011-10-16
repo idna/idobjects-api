@@ -170,7 +170,7 @@ public class ModelScope{
     private void fireNewObject( IdObject newObject ){
         if( !listenersById.containsKey( newObject.getId() ) ) return;
 
-        for( IdChangeListener listener : listenersById.get( newObject ) ){
+        for( IdChangeListener listener : listenersById.get( newObject.getId() ) ){
             listener.newObject( newObject.getId(), newObject );
         }
 
@@ -204,4 +204,19 @@ public class ModelScope{
         fireObjectRemoved( toRemove );
     }
 
+    public boolean isEqualTo( ModelScope otherModelScope ){
+        if( otherModelScope == null ) throw new NullPointerException();
+        if( otherModelScope == this ) return true;
+        if( size() != otherModelScope.size() ) return false;
+        if( !modelScopeId.equals( otherModelScope.getId() ) ) return false;
+        for( IdObject otherObject : otherModelScope.idObjectContainer.elements() ){
+            IdObject myObject = idObjectContainer.get( otherObject.getId() );
+            if( myObject == null ) return false;
+            if( !myObject.comparesContentTo( otherObject ) ) return false;
+            Map<IdObjectReferenceMD, List<IdObjectReference>> myReferences = myObject.getReferences();
+            Map<IdObjectReferenceMD, List<IdObjectReference>> otherReferences = otherObject.getReferences();
+            if( myReferences.size() != otherReferences.size() ) return false;
+        }
+        return true;
+    }
 }

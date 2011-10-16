@@ -53,6 +53,5 @@ public class IdObjectReferenceMD{
         if( !bidirectional ) return null;
         return getDestination().getReferenceByName( inverseReferenceName );
     }
-    
 
 }

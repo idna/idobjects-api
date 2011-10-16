@@ -19,4 +19,6 @@ public interface IdObject{
 
     Map<IdObjectReferenceMD, List<IdObjectReference>> getReferences();
 
+    boolean comparesContentTo( IdObject idObject );
+
 }

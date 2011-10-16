@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
 
 @MappedSuperclass
 public class AbstractPO{
@@ -53,6 +54,11 @@ public class AbstractPO{
         Object result = propertyValues.get( propertyMD );
         if( result != null || !propertyMD.getType().isPrimitive() ) return result;
         return primitiveDefaultValues.get( propertyMD.getType() );
+    }
+
+    @Transient
+    public Map<PersistencePropertyMD, Object> getPropertyValues(){
+        return new LinkedHashMap<PersistencePropertyMD, Object>( propertyValues );
     }
 
     protected void setPropertyValue( PersistencePropertyMD propertMD, Object value ){
