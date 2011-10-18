@@ -11,6 +11,9 @@ import com.idobjects.api.md.IdObjectPropertyMD;
 import com.idobjects.api.md.IdObjectReferenceMD;
 import com.idobjects.api.md.ReflectionUtil;
 
+/**
+ * AbstractIdObject
+ */
 public abstract class AbstractIdObject implements IdObject{
 
     private ObjectIdentifier id;
